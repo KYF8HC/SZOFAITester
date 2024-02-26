@@ -5,7 +5,6 @@ public class Trie : MonoBehaviour
 {
     private void Start()
     {
-        Debug.Log("Trie");
         //Read words from file
         var words = new List<string>();
         var file = Resources.Load<TextAsset>("words");
@@ -17,14 +16,22 @@ public class Trie : MonoBehaviour
         //Create trie
         var trie = new LetterTrie(words);
         //Test
-        var solver = new Solver(trie, new List<char>{'O', 'L', 'V', 'A', 'S', 'T', 'R', 'M'});
+        var board = new Board(10);  
+        
+        board.SetTile(new Vector2(3,4), 'L');
+        board.SetTile(new Vector2(3,3), 'O');
+        board.SetTile(new Vector2(3,2), 'P');
+        
+        var solver = new Solver(trie, new List<char>{'Á', 'R', 'M'}, board);
+        
         solver.FindAllOptions();
+        
         foreach (var word in solver._legalWords)
         {
             Debug.Log(word);
         }
         
-        var board = new Board(10);  
+        
         Debug.Log(board);   
     }
 }
