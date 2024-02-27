@@ -3,18 +3,23 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+// Class representing a single tile on the board
 public class Tile {
-    public Vector2 Position;
-    public bool IsEmpty;
-    public char Letter;
+    public Vector2 Position; // Position of the tile on the board
+    public bool IsEmpty; // Flag indicating whether the tile is empty
+    public char Letter; // Letter on the tile
 }
 
+// Class representing the game board
 public class Board {
-    private List<Tile> _tiles;
+    private List<Tile> _tiles; // List of tiles on the board
     
+    // Public property to access the list of tiles
     public List<Tile> Tiles => _tiles;
-    public int size = 0;
-    
+
+    public int size = 0; // Size of the board (assuming a square board)
+
+    // Constructor to initialize the board with empty tiles
     public Board(int size) {
         this.size = size;
         _tiles = new List<Tile>();
@@ -29,7 +34,7 @@ public class Board {
         }
     }
 
-    
+    // Method to create a deep copy (clone) of the board
     public Board Clone() {
         var clone = new Board(size);
         for (int i = 0; i < _tiles.Count(); i++) {
@@ -42,6 +47,7 @@ public class Board {
         return clone;
     }
 
+    // Method to set a tile on the board with a given letter
     public void SetTile(Vector2 position, char letter) {
         var tile = GetTile(position);
         if (tile == null) {
@@ -52,8 +58,8 @@ public class Board {
         tile.Letter = letter;
     }
 
+    // Method to get the tile at a specific position on the board
     public Tile GetTile(Vector2 position) {
-        // ReSharper disable once ForeachCanBeConvertedToQueryUsingAnotherGetEnumerator
         foreach (var tile in _tiles) {
             if (tile.Position == position) {
                 return tile;
@@ -63,24 +69,27 @@ public class Board {
         return null;
     }
 
+    // Method to check if a position is within the bounds of the board
     public bool IsInBounds(Vector2 position) {
         return position.x >= 0 && position.x < Math.Sqrt(_tiles.Count) &&
                position.y >= 0 && position.y < Math.Sqrt(_tiles.Count);
     }
 
+    // Method to check if a tile at a specific position is filled (contains a letter)
     public bool IsFilled(Vector2 position) {
         if (!IsInBounds(position)) return false;
         var tile = GetTile(position);
         return tile != null && !tile.IsEmpty;
     }
     
+    // Method to check if a tile at a specific position is empty
     public bool IsEmpty(Vector2 position) {
         if (!IsInBounds(position)) return false;
         var tile = GetTile(position);
         return tile != null && tile.IsEmpty;
     }
 
-
+    // Override ToString method to generate a string representation of the board
     public override string ToString() {
         var gridSize = (int)Mathf.Sqrt(_tiles.Count);
         var boardArray = new char[gridSize, gridSize];
@@ -93,15 +102,18 @@ public class Board {
         }
 
         var rows = new List<string>();
-        int index = 0;
-        for (var i = gridSize; i < 0; i--) {
+        for (var i = 0; i < gridSize; i++) {
             rows.Add("");
-            for (var j = gridSize; j < 0; j--) {
-                rows[index] += " " + boardArray[i, j];
+            for (var j = 0; j < gridSize; j++) {
+                rows[i] += " " + boardArray[i, j];
             }
-            index++;
         }
 
-        return string.Join("\n", rows.ToArray());
+        var boardString = "";
+        foreach (var row in rows){
+            boardString = row + "\n" + boardString;
+        }
+
+        return boardString;
     }
 }

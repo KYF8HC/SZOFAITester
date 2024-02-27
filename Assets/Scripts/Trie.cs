@@ -1,95 +1,100 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Trie : MonoBehaviour
-{
-    private void Start()
-    {
-        //Read words from file
+// Class to represent a Trie (not used directly in the provided code)
+public class Trie : MonoBehaviour {
+    private void Start() {
+        // Read words from file
         var words = new List<string>();
         var file = Resources.Load<TextAsset>("words");
         var lines = file.text.Split(' ');
-        foreach (var line in lines)
-        {
+        foreach (var line in lines) {
             words.Add(line.Trim());
         }
-        //Create trie
+
+        // Create trie
         var trie = new LetterTrie(words);
-        //Test
-        var board = new Board(10);  
-        
-        board.SetTile(new Vector2(3,4), 'L');
-        board.SetTile(new Vector2(3,3), 'O');
-        board.SetTile(new Vector2(3,2), 'P');
-        
-        var solver = new Solver(trie, new List<char>{'Á', 'R', 'M'}, board);
-        
+        // Test
+        var board = new Board(16);
+
+        board.SetTile(new Vector2(3, 2), 'K');
+        board.SetTile(new Vector2(3, 3), 'A');
+        board.SetTile(new Vector2(3, 4), 'R');
+        board.SetTile(new Vector2(5, 2), 'R');
+
+        var solver = new Solver(trie, new List<char> { 'Ó', 'R', 'A' }, board);
+
         solver.FindAllOptions();
-        
-        foreach (var word in solver._legalWords)
-        {
+
+        foreach (var word in solver.LegalWords) {
             Debug.Log(word);
         }
-        
-        
-        Debug.Log(board);   
+
+        Debug.Log(board);
     }
 }
 
+// Class to represent a node in the Trie
+public class TrieNode {
+    public bool isWord; // Flag indicating if the path to this node forms a complete word
+    public Dictionary<char, TrieNode> children; // Dictionary to store child nodes for each character
 
-public class TrieNode
-{
-    public bool isWord;
-    public Dictionary<char, TrieNode> children;
-
-    public TrieNode(char letter)
-    {
+    // Constructor for TrieNode
+    public TrieNode(char letter) {
         this.isWord = false;
         this.children = new Dictionary<char, TrieNode>();
     }
 }
 
-public class LetterTrie
-{
-    public TrieNode Root;
-    public LetterTrie(List<string> words)
-    {
-        Root = new TrieNode(' ');
-        foreach (var word in words)
-        {
-            AddWord(word);
+// Class to represent a Trie for storing words and looking up their presence
+public class LetterTrie {
+    public TrieNode Root; // Root node of the Trie
+    public TrieNode Current; // Current node used during Trie operations
+
+    // Constructor for LetterTrie, initializing it with a list of words
+    public LetterTrie(List<string> words) {
+        Root = new TrieNode(' '); // Initialize the root node with a dummy character
+        foreach (var word in words) {
+            AddWord(word); // Add each word to the Trie
         }
     }
-    public void AddWord(string word)
-    {
+
+    // Method to add a word to the Trie
+    public void AddWord(string word) {
         var current = Root;
-        foreach (var letter in word)
-        {
-            if (!current.children.ContainsKey(letter))
-            {
+        Current = current;
+        foreach (var letter in word) {
+            // Add a new node for the letter if it doesn't exist
+            if (!current.children.ContainsKey(letter)) {
                 current.children.Add(letter, new TrieNode(letter));
             }
+
             current = current.children[letter];
+            Current = current;
         }
-        current.isWord = true;
+
+        current.isWord = true; // Mark the last node as representing a complete word
     }
-    
-    public TrieNode LookUp(string word)
-    {
+
+    // Method to look up a word in the Trie and return the corresponding node
+    public TrieNode LookUp(string word) {
         var current = Root;
-        foreach (var letter in word)
-        {
-            if (!current.children.ContainsKey(letter))
-            {
+        Current = current;
+        foreach (var letter in word) {
+            // If a node for the letter is not found, return null
+            if (!current.children.ContainsKey(letter)) {
                 return null;
             }
+
             current = current.children[letter];
+            Current = current;
         }
+
         return current;
     }
-    
-    public bool IsWord(string word)
-    {
+
+    // Method to check if a given string is a complete word in the Trie
+    public bool IsWord(string word) {
         var node = LookUp(word);
         return node != null && node.isWord;
     }
