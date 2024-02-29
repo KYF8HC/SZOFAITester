@@ -14,7 +14,8 @@ public class Solver {
         'F', 'G', 'H', 'I', 'Í', 'J', 'K', 'L',
         'M', 'N', 'O', 'Ó', 'Ö', 'Ő', 'P', 'Q',
         'R', 'S', 'T', 'U', 'Ú', 'Ü', 'Ű', 'V',
-        'W', 'X', 'Y', 'Z'
+        'W', 'X', 'Y', 'Z', '0', '1', '2', '3',
+        '4', '5', '6'
     };
 
     private LetterTrie _trie; // Trie data structure for storing valid words
@@ -73,7 +74,9 @@ public class Solver {
         // Place the word on the cloned board
         while (letterIndex >= 0) {
             var letter = word[letterIndex];
-            boardIfWePlaceWord.SetTile(playPosition, letter);
+            string displayLetter = letter.ToString();
+            LetterSubstituter.SubstituteNumberToLetter(letter, ref displayLetter);
+            boardIfWePlaceWord.SetTile(playPosition, displayLetter);
             letterIndex--;
             playPosition = Before(playPosition);
         }
@@ -191,8 +194,15 @@ public class Solver {
             else {
                 // Continue with the existing letter on the board
                 var existingTile = _board.GetTile(nextPosition);
-                if(currentNode.children.ContainsKey(existingTile.Letter)){
-                    ExtendAfter(currentNode.children[existingTile.Letter], partialWord + existingTile.Letter, After(nextPosition), true);
+                var existingLetter = existingTile.Letter;
+                if (existingTile.Letter.Length > 1)
+                {
+                    LetterSubstituter.SubstituteLetterToNumber(existingLetter[0], existingLetter[1],
+                        ref existingLetter);
+                }
+
+                if(currentNode.children.ContainsKey(existingLetter[0])){
+                    ExtendAfter(currentNode.children[existingLetter[0]], partialWord + existingLetter, After(nextPosition), true);
                 }
             }
         }
@@ -214,7 +224,7 @@ public class Solver {
                     
                     // Handle partial words if there is a filled position before the anchor
                     var scanPosition = Before(anchor.Position);
-                    var partialWord = _board.GetTile(scanPosition).Letter.ToString();
+                    var partialWord = _board.GetTile(scanPosition).Letter;
                     
                     while (_board.IsFilled(Before(scanPosition))) {
                         scanPosition = Before(scanPosition);

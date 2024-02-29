@@ -7,7 +7,7 @@ using UnityEngine;
 public class Tile {
     public Vector2 Position; // Position of the tile on the board
     public bool IsEmpty; // Flag indicating whether the tile is empty
-    public char Letter; // Letter on the tile
+    public string Letter; // Letter on the tile
 }
 
 // Class representing the game board
@@ -28,7 +28,7 @@ public class Board {
                 _tiles.Add(new Tile {
                     Position = new Vector2(i, j),
                     IsEmpty = true,
-                    Letter = ' '
+                    Letter = ""
                 });
             }
         }
@@ -48,11 +48,14 @@ public class Board {
     }
 
     // Method to set a tile on the board with a given letter
-    public void SetTile(Vector2 position, char letter) {
+    public void SetTile(Vector2 position, string letter) {
         var tile = GetTile(position);
         if (tile == null) {
             return;
         }
+
+        if (letter == "1")
+            Debug.Log("ASD");
 
         tile.IsEmpty = false;
         tile.Letter = letter;
@@ -92,13 +95,13 @@ public class Board {
     // Override ToString method to generate a string representation of the board
     public override string ToString() {
         var gridSize = (int)Mathf.Sqrt(_tiles.Count);
-        var boardArray = new char[gridSize, gridSize];
+        var boardArray = new string[gridSize, gridSize];
 
         foreach (var tile in _tiles) {
             var row = gridSize - 1 - (int)tile.Position.y;
             var col = (int)tile.Position.x;
 
-            boardArray[row, col] = tile.IsEmpty ? '-' : tile.Letter;
+            boardArray[row, col] = tile.IsEmpty ? "-" : tile.Letter;
         }
 
         var rows = new List<string>();
