@@ -24,7 +24,7 @@ public class Trie : MonoBehaviour
         board.SetTile(new Vector2(3, 4), "A");
         board.SetTile(new Vector2(8, 2), "R");
 
-        var solver = new Solver(trie, new List<char> { 'Ő', '3', 'Z' }, board);
+        var solver = new Solver(trie, new List<char> { 'Ő', 'A', 'Z' }, board);
 
         solver.FindAllOptions();
 
